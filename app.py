@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
+from book import app as app_book
 
 app = FastAPI()
 
@@ -20,6 +21,12 @@ async def index():
         'msg': ':bird: 33-4 :tiger:'
     }
 
+
+app.include_router(
+    app_book.api,
+    prefix='/book',
+    tags=['book']
+)
 
 if __name__ == '__main__':
     import uvicorn
