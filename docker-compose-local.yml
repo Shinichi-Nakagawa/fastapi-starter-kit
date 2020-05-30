@@ -1,0 +1,8 @@
+version: "3.0"
+services:
+  app:
+    build: .
+    ports:
+      - 8080:8080
+    container_name: fastapi_sample
+    command: ["python", "app.py"]
