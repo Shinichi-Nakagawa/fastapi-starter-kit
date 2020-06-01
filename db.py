@@ -2,9 +2,12 @@ from sqlalchemy import Column, Integer, String, Date, Boolean, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, sessionmaker
 
-DB_URI = 'sqlite:///./books.db'
+CONNECT_ARGS = {"check_same_thread": False}
 
-engine = create_engine(DB_URI, connect_args={"check_same_thread": False}, echo=True)
+
+def get_engine(uri='sqlite:///./books.db', connect_args=CONNECT_ARGS, echo=True):
+    return create_engine(uri, connect_args=connect_args, echo=echo)
+
 
 Base = declarative_base()
 
@@ -17,6 +20,8 @@ class Book(Base):
     read = Column('read', Boolean, default=False)
 
 
+engine = get_engine()
+
 Base.metadata.create_all(bind=engine)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -27,12 +32,7 @@ def session():
     Get Database Session
     :return:
     """
-    db = None
-    try:
-        db = SessionLocal()
-        yield db
-    finally:
-        db.close()
+    return SessionLocal()
 
 
 class DatabaseSession(Session):

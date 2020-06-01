@@ -1,6 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from starlette.middleware.cors import CORSMiddleware
 from book import app as app_book
+from db import session
 
 app = FastAPI()
 
@@ -27,6 +28,18 @@ app.include_router(
     prefix='/book',
     tags=['book']
 )
+
+
+@app.middleware("http")
+async def db_session_middleware(request: Request, call_next):
+    response = Response("Internal server error", status_code=500)
+    try:
+        request.state.db = session()
+        response = await call_next(request)
+    finally:
+        request.state.db.close()
+    return response
+
 
 if __name__ == '__main__':
     import uvicorn
