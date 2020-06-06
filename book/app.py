@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import desc
 from fastapi import APIRouter, Depends, Request
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 from db import DatabaseSession, Book
 
@@ -16,6 +16,18 @@ def get_db(request: Request):
 
 class BookModel(BaseModel):
     title: str
+
+    class Meta:
+        min_length = 1
+        max_length = 250
+        msg_length = f"title.length(min={min_length}, max={max_length})"
+
+    @validator('title')
+    def validator_title(cls, v):
+        length = len(v)
+        if length < cls.Meta.min_length or length > cls.Meta.max_length:
+            raise ValueError(f'{cls.Meta.msg_length}: {v}({length})')
+        return v
 
 
 @api.get("/")

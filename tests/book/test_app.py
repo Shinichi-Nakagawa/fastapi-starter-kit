@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
-from book.app import get_db
+from book.app import get_db, BookModel
 from db import Book
 
 
@@ -113,3 +113,17 @@ def test_get_index(
     assert body[2]['id'] == 1
     assert body[2]['title'] == 'アルゴリズム図鑑'
     assert body[2]['created_at'] == now.strftime('%Y-%m-%d')
+
+
+def test_book_model():
+    book = BookModel(title='Money Ball')
+    assert book.title == 'Money Ball'
+    book = BookModel(title='bigdata baseball')
+
+
+def test_book_model_value_error():
+    with pytest.raises(ValueError):
+        BookModel(title='')
+    with pytest.raises(ValueError):
+        long_title = "".join(['a' for _ in range(251)])
+        BookModel(title=long_title)
